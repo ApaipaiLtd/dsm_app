@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 class HttpUtil {
@@ -25,16 +27,25 @@ class HttpUtil {
       headers: {},
     );
     dio = Dio(options);
+    if (kDebugMode) {
+      (dio?.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate = (client) {
+        client.findProxy = (uri) {
+          return "PROXY 192.168.0.107:8888";
+        };
+        return client;
+      }; //
+    }
+    CookieJar cookieJar = CookieJar();
     dio?.interceptors
       ?..add(InterceptorsWrapper(onRequest: (RequestOptions options, handler) async {
         return handler.next(options);
       }, onResponse: (Response response, handler) async {
         return handler.next(response);
-      }, onError: (DioError error, handler) async {
+      }, onError: (DioException error, handler) async {
         return handler.reject(error);
       }))
       ..add(LogInterceptor(request: false, requestBody: true, responseBody: true, responseHeader: false, requestHeader: false))
-      ..add(CookieManager(CookieJar()));
+      ..add(CookieManager(cookieJar));
   }
 
   Future get(String url, {Map<String, dynamic>? parameters, Options? options}) async {

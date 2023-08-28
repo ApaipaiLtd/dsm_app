@@ -1,0 +1,2299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>dddddd</h1>
+<button onclick="encrypt()">加密</button>
+<script>
+    var synowebapi = function () {
+        "use strict";
+
+        function t(t) {
+            return "[object Object]" == Object.prototype.toString.call(t)
+        }
+
+        function e(t, e) {
+            return Object.prototype.hasOwnProperty.call(t, e)
+        }
+
+        function r(t) {
+            return "[object Error]" == Object.prototype.toString.call(t)
+        }
+
+        function n(t) {
+            var r = [];
+            for (var n in t)
+                e(t, n) && r.push(encodeURIComponent(n) + "=" + encodeURIComponent(t[n]));
+            return r.join("&")
+        }
+
+        function i(t) {
+            return null == t
+        }
+
+        var o = function () {
+            function t(t, e, r) {
+                i(t) || ("number" == typeof t ? this.fromNumber(t, e, r) : i(e) && "string" != typeof t ? this.fromString(t, 256) : this.fromString(t, e))
+            }
+
+            function e() {
+                return new t(null)
+            }
+
+            function r(t, e, r, n, i, o) {
+                for (; --o >= 0;) {
+                    var s = e * this[t++] + r[n] + i;
+                    i = Math.floor(s / 67108864),
+                        r[n++] = 67108863 & s
+                }
+                return i
+            }
+
+            function n(t, e, r, n, i, o) {
+                for (var s = 32767 & e, a = e >> 15; --o >= 0;) {
+                    var c = 32767 & this[t]
+                        , h = this[t++] >> 15
+                        , u = a * c + h * s;
+                    i = ((c = s * c + ((32767 & u) << 15) + r[n] + (1073741823 & i)) >>> 30) + (u >>> 15) + a * h + (i >>> 30),
+                        r[n++] = 1073741823 & c
+                }
+                return i
+            }
+
+            function o(t, e, r, n, i, o) {
+                for (var s = 16383 & e, a = e >> 14; --o >= 0;) {
+                    var c = 16383 & this[t]
+                        , h = this[t++] >> 14
+                        , u = a * c + h * s;
+                    i = ((c = s * c + ((16383 & u) << 14) + r[n] + i) >> 28) + (u >> 14) + a * h,
+                        r[n++] = 268435455 & c
+                }
+                return i
+            }
+
+            var s, a = ("Microsoft Internet Explorer" === (s = "undefined" != typeof navigator && navigator.appName) ? (t.prototype.am = n,
+                a = 30) : "Netscape" === s ? (t.prototype.am = r,
+                a = 26) : (t.prototype.am = o,
+                a = 28),
+                a);
+            t.prototype.DB = a,
+                t.prototype.DM = (1 << a) - 1,
+                t.prototype.DV = 1 << a;
+            t.prototype.FV = Math.pow(2, 52),
+                t.prototype.F1 = 52 - a,
+                t.prototype.F2 = 2 * a - 52;
+            var c, h, u = [];
+            for (c = "0".charCodeAt(0),
+                     h = 0; h <= 9; ++h)
+                u[c++] = h;
+            for (c = "a".charCodeAt(0),
+                     h = 10; h < 36; ++h)
+                u[c++] = h;
+            for (c = "A".charCodeAt(0),
+                     h = 10; h < 36; ++h)
+                u[c++] = h;
+
+            function f(t) {
+                return "0123456789abcdefghijklmnopqrstuvwxyz".charAt(t)
+            }
+
+            function p(t, e) {
+                var r = u[t.charCodeAt(e)];
+                return i(r) ? -1 : r
+            }
+
+            function l(t) {
+                var r = e();
+                return r.fromInt(t),
+                    r
+            }
+
+            function d(t) {
+                var e, r = 1;
+                return 0 != (e = t >>> 16) && (t = e,
+                    r += 16),
+                0 != (e = t >> 8) && (t = e,
+                    r += 8),
+                0 != (e = t >> 4) && (t = e,
+                    r += 4),
+                0 != (e = t >> 2) && (t = e,
+                    r += 2),
+                0 != (e = t >> 1) && (t = e,
+                    r += 1),
+                    r
+            }
+
+            function v(t) {
+                this.m = t
+            }
+
+            function m(t) {
+                this.m = t,
+                    this.mp = t.invDigit(),
+                    this.mpl = 32767 & this.mp,
+                    this.mph = this.mp >> 15,
+                    this.um = (1 << t.DB - 15) - 1,
+                    this.mt2 = 2 * t.t
+            }
+
+            return v.prototype.convert = function (t) {
+                return t.s < 0 || t.compareTo(this.m) >= 0 ? t.mod(this.m) : t
+            }
+                ,
+                v.prototype.revert = function (t) {
+                    return t
+                }
+                ,
+                v.prototype.reduce = function (t) {
+                    t.divRemTo(this.m, null, t)
+                }
+                ,
+                v.prototype.mulTo = function (t, e, r) {
+                    t.multiplyTo(e, r),
+                        this.reduce(r)
+                }
+                ,
+                v.prototype.sqrTo = function (t, e) {
+                    t.squareTo(e),
+                        this.reduce(e)
+                }
+                ,
+                m.prototype.convert = function (r) {
+                    var n = e();
+                    return r.abs().dlShiftTo(this.m.t, n),
+                        n.divRemTo(this.m, null, n),
+                    r.s < 0 && n.compareTo(t.ZERO) > 0 && this.m.subTo(n, n),
+                        n
+                }
+                ,
+                m.prototype.revert = function (t) {
+                    var r = e();
+                    return t.copyTo(r),
+                        this.reduce(r),
+                        r
+                }
+                ,
+                m.prototype.reduce = function (t) {
+                    for (; t.t <= this.mt2;)
+                        t[t.t++] = 0;
+                    for (var e = 0; e < this.m.t; ++e) {
+                        var r = 32767 & t[e]
+                            , n = r * this.mpl + ((r * this.mph + (t[e] >> 15) * this.mpl & this.um) << 15) & t.DM;
+                        for (t[r = e + this.m.t] += this.m.am(0, n, t, e, 0, this.m.t); t[r] >= t.DV;)
+                            t[r] -= t.DV,
+                                t[++r]++
+                    }
+                    t.clamp(),
+                        t.drShiftTo(this.m.t, t),
+                    t.compareTo(this.m) >= 0 && t.subTo(this.m, t)
+                }
+                ,
+                m.prototype.mulTo = function (t, e, r) {
+                    t.multiplyTo(e, r),
+                        this.reduce(r)
+                }
+                ,
+                m.prototype.sqrTo = function (t, e) {
+                    t.squareTo(e),
+                        this.reduce(e)
+                }
+                ,
+                t.prototype.copyTo = function (t) {
+                    for (var e = this.t - 1; e >= 0; --e)
+                        t[e] = this[e];
+                    t.t = this.t,
+                        t.s = this.s
+                }
+                ,
+                t.prototype.fromInt = function (t) {
+                    this.t = 1,
+                        this.s = t < 0 ? -1 : 0,
+                        t > 0 ? this[0] = t : t < -1 ? this[0] = t + this.DV : this.t = 0
+                }
+                ,
+                t.prototype.fromString = function (e, r) {
+                    var n;
+                    if (16 == r)
+                        n = 4;
+                    else if (8 == r)
+                        n = 3;
+                    else if (256 == r)
+                        n = 8;
+                    else if (2 == r)
+                        n = 1;
+                    else if (32 == r)
+                        n = 5;
+                    else {
+                        if (4 != r)
+                            return void this.fromRadix(e, r);
+                        n = 2
+                    }
+                    this.t = 0,
+                        this.s = 0;
+                    for (var i = e.length, o = !1, s = 0; --i >= 0;) {
+                        var a = 8 == n ? 255 & e[i] : p(e, i);
+                        a < 0 ? "-" == e.charAt(i) && (o = !0) : (o = !1,
+                            0 === s ? this[this.t++] = a : s + n > this.DB ? (this[this.t - 1] |= (a & (1 << this.DB - s) - 1) << s,
+                                this[this.t++] = a >> this.DB - s) : this[this.t - 1] |= a << s,
+                        (s += n) >= this.DB && (s -= this.DB))
+                    }
+                    8 == n && 0 != (128 & e[0]) && (this.s = -1,
+                    s > 0 && (this[this.t - 1] |= (1 << this.DB - s) - 1 << s)),
+                        this.clamp(),
+                    o && t.ZERO.subTo(this, this)
+                }
+                ,
+                t.prototype.clamp = function () {
+                    for (var t = this.s & this.DM; this.t > 0 && this[this.t - 1] == t;)
+                        --this.t
+                }
+                ,
+                t.prototype.dlShiftTo = function (t, e) {
+                    var r;
+                    for (r = this.t - 1; r >= 0; --r)
+                        e[r + t] = this[r];
+                    for (r = t - 1; r >= 0; --r)
+                        e[r] = 0;
+                    e.t = this.t + t,
+                        e.s = this.s
+                }
+                ,
+                t.prototype.drShiftTo = function (t, e) {
+                    for (var r = t; r < this.t; ++r)
+                        e[r - t] = this[r];
+                    e.t = Math.max(this.t - t, 0),
+                        e.s = this.s
+                }
+                ,
+                t.prototype.lShiftTo = function (t, e) {
+                    var r, n = t % this.DB, i = this.DB - n, o = (1 << i) - 1, s = Math.floor(t / this.DB), a = this.s << n & this.DM;
+                    for (r = this.t - 1; r >= 0; --r)
+                        e[r + s + 1] = this[r] >> i | a,
+                            a = (this[r] & o) << n;
+                    for (r = s - 1; r >= 0; --r)
+                        e[r] = 0;
+                    e[s] = a,
+                        e.t = this.t + s + 1,
+                        e.s = this.s,
+                        e.clamp()
+                }
+                ,
+                t.prototype.rShiftTo = function (t, e) {
+                    e.s = this.s;
+                    var r = Math.floor(t / this.DB);
+                    if (r >= this.t)
+                        e.t = 0;
+                    else {
+                        var n = t % this.DB
+                            , i = this.DB - n
+                            , o = (1 << n) - 1;
+                        e[0] = this[r] >> n;
+                        for (var s = r + 1; s < this.t; ++s)
+                            e[s - r - 1] |= (this[s] & o) << i,
+                                e[s - r] = this[s] >> n;
+                        n > 0 && (e[this.t - r - 1] |= (this.s & o) << i),
+                            e.t = this.t - r,
+                            e.clamp()
+                    }
+                }
+                ,
+                t.prototype.subTo = function (t, e) {
+                    for (var r = 0, n = 0, i = Math.min(t.t, this.t); r < i;)
+                        n += this[r] - t[r],
+                            e[r++] = n & this.DM,
+                            n >>= this.DB;
+                    if (t.t < this.t) {
+                        for (n -= t.s; r < this.t;)
+                            n += this[r],
+                                e[r++] = n & this.DM,
+                                n >>= this.DB;
+                        n += this.s
+                    } else {
+                        for (n += this.s; r < t.t;)
+                            n -= t[r],
+                                e[r++] = n & this.DM,
+                                n >>= this.DB;
+                        n -= t.s
+                    }
+                    e.s = n < 0 ? -1 : 0,
+                        n < -1 ? e[r++] = this.DV + n : n > 0 && (e[r++] = n),
+                        e.t = r,
+                        e.clamp()
+                }
+                ,
+                t.prototype.multiplyTo = function (e, r) {
+                    var n = this.abs()
+                        , i = e.abs()
+                        , o = n.t;
+                    for (r.t = o + i.t; --o >= 0;)
+                        r[o] = 0;
+                    for (o = 0; o < i.t; ++o)
+                        r[o + n.t] = n.am(0, i[o], r, o, 0, n.t);
+                    r.s = 0,
+                        r.clamp(),
+                    this.s != e.s && t.ZERO.subTo(r, r)
+                }
+                ,
+                t.prototype.squareTo = function (t) {
+                    var e, r = this.abs();
+                    for (e = t.t = 2 * r.t; --e >= 0;)
+                        t[e] = 0;
+                    for (e = 0; e < r.t - 1; ++e) {
+                        var n = r.am(e, r[e], t, 2 * e, 0, 1);
+                        (t[e + r.t] += r.am(e + 1, 2 * r[e], t, 2 * e + 1, n, r.t - e - 1)) >= r.DV && (t[e + r.t] -= r.DV,
+                            t[e + r.t + 1] = 1)
+                    }
+                    t.t > 0 && (t[t.t - 1] += r.am(e, r[e], t, 2 * e, 0, 1)),
+                        t.s = 0,
+                        t.clamp()
+                }
+                ,
+                t.prototype.divRemTo = function (r, n, o) {
+                    var s = r.abs();
+                    if (!(s.t <= 0)) {
+                        var a = this.abs();
+                        if (a.t < s.t)
+                            return i(n) || n.fromInt(0),
+                                void (i(o) || this.copyTo(o));
+                        i(o) && (o = e());
+                        var c = e()
+                            , h = this.s
+                            , u = r.s
+                            , f = this.DB - d(s[s.t - 1]);
+                        f > 0 ? (s.lShiftTo(f, c),
+                            a.lShiftTo(f, o)) : (s.copyTo(c),
+                            a.copyTo(o));
+                        var p = c.t
+                            , l = c[p - 1];
+                        if (0 !== l) {
+                            var v = l * (1 << this.F1) + (p > 1 ? c[p - 2] >> this.F2 : 0)
+                                , m = this.FV / v
+                                , y = (1 << this.F1) / v
+                                , g = 1 << this.F2
+                                , _ = o.t
+                                , b = _ - p
+                                , w = i(n) ? e() : n;
+                            for (c.dlShiftTo(b, w),
+                                 o.compareTo(w) >= 0 && (o[o.t++] = 1,
+                                     o.subTo(w, o)),
+                                     t.ONE.dlShiftTo(p, w),
+                                     w.subTo(c, c); c.t < p;)
+                                c[c.t++] = 0;
+                            for (; --b >= 0;) {
+                                var S = o[--_] == l ? this.DM : Math.floor(o[_] * m + (o[_ - 1] + g) * y);
+                                if ((o[_] += c.am(0, S, o, b, 0, p)) < S)
+                                    for (c.dlShiftTo(b, w),
+                                             o.subTo(w, o); o[_] < --S;)
+                                        o.subTo(w, o)
+                            }
+                            i(n) || (o.drShiftTo(p, n),
+                            h != u && t.ZERO.subTo(n, n)),
+                                o.t = p,
+                                o.clamp(),
+                            f > 0 && o.rShiftTo(f, o),
+                            h < 0 && t.ZERO.subTo(o, o)
+                        }
+                    }
+                }
+                ,
+                t.prototype.invDigit = function () {
+                    if (this.t < 1)
+                        return 0;
+                    var t = this[0];
+                    if (0 == (1 & t))
+                        return 0;
+                    var e = 3 & t;
+                    return (e = (e = (e = (e = e * (2 - (15 & t) * e) & 15) * (2 - (255 & t) * e) & 255) * (2 - ((65535 & t) * e & 65535)) & 65535) * (2 - t * e % this.DV) % this.DV) > 0 ? this.DV - e : -e
+                }
+                ,
+                t.prototype.isEven = function () {
+                    return 0 === (this.t > 0 ? 1 & this[0] : this.s)
+                }
+                ,
+                t.prototype.exp = function (r, n) {
+                    if (r > 4294967295 || r < 1)
+                        return t.ONE;
+                    var i = e()
+                        , o = e()
+                        , s = n.convert(this)
+                        , a = d(r) - 1;
+                    for (s.copyTo(i); --a >= 0;)
+                        if (n.sqrTo(i, o),
+                        (r & 1 << a) > 0)
+                            n.mulTo(o, s, i);
+                        else {
+                            var c = i;
+                            i = o,
+                                o = c
+                        }
+                    return n.revert(i)
+                }
+                ,
+                t.prototype.toString = function (t) {
+                    if (this.s < 0)
+                        return "-" + this.negate().toString(t);
+                    var e;
+                    if (16 == t)
+                        e = 4;
+                    else if (8 == t)
+                        e = 3;
+                    else if (2 == t)
+                        e = 1;
+                    else if (32 == t)
+                        e = 5;
+                    else {
+                        if (4 != t)
+                            return this.toRadix(t);
+                        e = 2
+                    }
+                    var r, n = (1 << e) - 1, i = !1, o = "", s = this.t, a = this.DB - s * this.DB % e;
+                    if (s-- > 0)
+                        for (a < this.DB && (r = this[s] >> a) > 0 && (i = !0,
+                            o = f(r)); s >= 0;)
+                            a < e ? (r = (this[s] & (1 << a) - 1) << e - a,
+                                r |= this[--s] >> (a += this.DB - e)) : (r = this[s] >> (a -= e) & n,
+                            a <= 0 && (a += this.DB,
+                                --s)),
+                            r > 0 && (i = !0),
+                            i && (o += f(r));
+                    return i ? o : "0"
+                }
+                ,
+                t.prototype.negate = function () {
+                    var r = e();
+                    return t.ZERO.subTo(this, r),
+                        r
+                }
+                ,
+                t.prototype.abs = function () {
+                    return this.s < 0 ? this.negate() : this
+                }
+                ,
+                t.prototype.compareTo = function (t) {
+                    var e = this.s - t.s;
+                    if (0 !== e)
+                        return e;
+                    var r = this.t;
+                    if (0 !== (e = r - t.t))
+                        return e;
+                    for (; --r >= 0;)
+                        if (0 != (e = this[r] - t[r]))
+                            return e;
+                    return 0
+                }
+                ,
+                t.prototype.bitLength = function () {
+                    return this.t <= 0 ? 0 : this.DB * (this.t - 1) + d(this[this.t - 1] ^ this.s & this.DM)
+                }
+                ,
+                t.prototype.mod = function (r) {
+                    var n = e();
+                    return this.abs().divRemTo(r, null, n),
+                    this.s < 0 && n.compareTo(t.ZERO) > 0 && r.subTo(n, n),
+                        n
+                }
+                ,
+                t.prototype.modPowInt = function (t, e) {
+                    var r;
+                    return r = t < 256 || e.isEven() ? new v(e) : new m(e),
+                        this.exp(t, r)
+                }
+                ,
+                t.ZERO = l(0),
+                t.ONE = l(1),
+                t
+        }()
+            , s = function () {
+            function t() {
+                this.i = 0,
+                    this.j = 0,
+                    this.S = []
+            }
+
+            t.prototype.init = function (t) {
+                var e, r, n;
+                for (e = 0; e < 256; ++e)
+                    this.S[e] = e;
+                for (r = 0,
+                         e = 0; e < 256; ++e)
+                    r = r + this.S[e] + t[e % t.length] & 255,
+                        n = this.S[e],
+                        this.S[e] = this.S[r],
+                        this.S[r] = n;
+                this.i = 0,
+                    this.j = 0
+            }
+                ,
+                t.prototype.next = function () {
+                    var t;
+                    return this.i = this.i + 1 & 255,
+                        this.j = this.j + this.S[this.i] & 255,
+                        t = this.S[this.i],
+                        this.S[this.i] = this.S[this.j],
+                        this.S[this.j] = t,
+                        this.S[t + this.S[this.i] & 255]
+                }
+            ;
+            var e, r, n;
+
+            function i() {
+                var t;
+                t = (new Date).getTime(),
+                    r[n++] ^= 255 & t,
+                    r[n++] ^= t >> 8 & 255,
+                    r[n++] ^= t >> 16 & 255,
+                    r[n++] ^= t >> 24 & 255,
+                n >= 256 && (n -= 256)
+            }
+
+            if (!r) {
+                var o;
+                for (r = [],
+                         n = 0; n < 256;)
+                    o = Math.floor(65536 * Math.random()),
+                        r[n++] = o >>> 8,
+                        r[n++] = 255 & o;
+                n = 0,
+                    i()
+            }
+
+            function s() {
+                if (!e) {
+                    for (i(),
+                             (e = new t).init(r),
+                             n = 0; n < r.length; ++n)
+                        r[n] = 0;
+                    n = 0
+                }
+                return e.next()
+            }
+
+            function a() {
+            }
+
+            return a.prototype.nextBytes = function (t) {
+                var e;
+                for (e = 0; e < t.length; ++e)
+                    t[e] = s()
+            }
+                ,
+                a.rng_seed_time = i,
+                a
+        }();
+
+        function a(t) {
+            return null == t
+        }
+
+        var c = function () {
+            function t() {
+                this.n = null,
+                    this.e = 0,
+                    this.d = null,
+                    this.p = null,
+                    this.q = null,
+                    this.dmp1 = null,
+                    this.dmq1 = null,
+                    this.coeff = null
+            }
+
+            return t.prototype.doPublic = function (t) {
+                return t.modPowInt(this.e, this.n)
+            }
+                ,
+                t.prototype.setPublic = function (t, e) {
+                    !a(t) && !a(e) && t.length > 0 && e.length > 0 && (this.n = new o(t, 16),
+                        this.e = parseInt(e, 16))
+                }
+                ,
+                t.prototype.encrypt = function (t) {
+                    var e = function (t, e) {
+                        if (e < t.length + 11)
+                            return null;
+                        for (var r = [], n = t.length - 1; n >= 0 && e > 0;) {
+                            var i = t.charCodeAt(n--);
+                            i < 128 ? r[--e] = i : i > 127 && i < 2048 ? (r[--e] = 63 & i | 128,
+                                r[--e] = i >> 6 | 192) : (r[--e] = 63 & i | 128,
+                                r[--e] = i >> 6 & 63 | 128,
+                                r[--e] = i >> 12 | 224)
+                        }
+                        r[--e] = 0;
+                        for (var a = new s, c = []; e > 2;) {
+                            for (c[0] = 0; 0 === c[0];)
+                                a.nextBytes(c);
+                            r[--e] = c[0]
+                        }
+                        return r[--e] = 2,
+                            r[--e] = 0,
+                            new o(r)
+                    }(t, this.n.bitLength() + 7 >> 3);
+                    if (a(e))
+                        return null;
+                    var r = this.doPublic(e);
+                    if (a(r))
+                        return null;
+                    var n = r.toString(16);
+                    return 0 == (1 & n.length) ? n : "0" + n
+                }
+                ,
+                t
+        }();
+        "undefined" != typeof globalThis ? globalThis : "undefined" != typeof window ? window : "undefined" != typeof global ? global : "undefined" != typeof self && self;
+
+        function h(t) {
+            var e = {
+                exports: {}
+            };
+            return t(e, e.exports),
+                e.exports
+        }
+
+        var u = h((function (t, e) {
+                var r;
+                t.exports = r = r || function (t, e) {
+                    var r = Object.create || function () {
+                        function t() {
+                        }
+
+                        return function (e) {
+                            var r;
+                            return t.prototype = e,
+                                r = new t,
+                                t.prototype = null,
+                                r
+                        }
+                    }()
+                        , n = {}
+                        , i = n.lib = {}
+                        , o = i.Base = {
+                        extend: function (t) {
+                            var e = r(this);
+                            return t && e.mixIn(t),
+                            e.hasOwnProperty("init") && this.init !== e.init || (e.init = function () {
+                                    e.$super.init.apply(this, arguments)
+                                }
+                            ),
+                                e.init.prototype = e,
+                                e.$super = this,
+                                e
+                        },
+                        create: function () {
+                            var t = this.extend();
+                            return t.init.apply(t, arguments),
+                                t
+                        },
+                        init: function () {
+                        },
+                        mixIn: function (t) {
+                            for (var e in t)
+                                t.hasOwnProperty(e) && (this[e] = t[e]);
+                            t.hasOwnProperty("toString") && (this.toString = t.toString)
+                        },
+                        clone: function () {
+                            return this.init.prototype.extend(this)
+                        }
+                    }
+                        , s = i.WordArray = o.extend({
+                        init: function (t, r) {
+                            t = this.words = t || [],
+                                this.sigBytes = r != e ? r : 4 * t.length
+                        },
+                        toString: function (t) {
+                            return (t || c).stringify(this)
+                        },
+                        concat: function (t) {
+                            var e = this.words
+                                , r = t.words
+                                , n = this.sigBytes
+                                , i = t.sigBytes;
+                            if (this.clamp(),
+                            n % 4)
+                                for (var o = 0; o < i; o++) {
+                                    var s = r[o >>> 2] >>> 24 - o % 4 * 8 & 255;
+                                    e[n + o >>> 2] |= s << 24 - (n + o) % 4 * 8
+                                }
+                            else
+                                for (o = 0; o < i; o += 4)
+                                    e[n + o >>> 2] = r[o >>> 2];
+                            return this.sigBytes += i,
+                                this
+                        },
+                        clamp: function () {
+                            var e = this.words
+                                , r = this.sigBytes;
+                            e[r >>> 2] &= 4294967295 << 32 - r % 4 * 8,
+                                e.length = t.ceil(r / 4)
+                        },
+                        clone: function () {
+                            var t = o.clone.call(this);
+                            return t.words = this.words.slice(0),
+                                t
+                        },
+                        random: function (e) {
+                            for (var r, n = [], i = function (e) {
+                                e = e;
+                                var r = 987654321
+                                    , n = 4294967295;
+                                return function () {
+                                    var i = ((r = 36969 * (65535 & r) + (r >> 16) & n) << 16) + (e = 18e3 * (65535 & e) + (e >> 16) & n) & n;
+                                    return i /= 4294967296,
+                                    (i += .5) * (t.random() > .5 ? 1 : -1)
+                                }
+                            }, o = 0; o < e; o += 4) {
+                                var a = i(4294967296 * (r || t.random()));
+                                r = 987654071 * a(),
+                                    n.push(4294967296 * a() | 0)
+                            }
+                            return new s.init(n, e)
+                        }
+                    })
+                        , a = n.enc = {}
+                        , c = a.Hex = {
+                        stringify: function (t) {
+                            for (var e = t.words, r = t.sigBytes, n = [], i = 0; i < r; i++) {
+                                var o = e[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                                n.push((o >>> 4).toString(16)),
+                                    n.push((15 & o).toString(16))
+                            }
+                            return n.join("")
+                        },
+                        parse: function (t) {
+                            for (var e = t.length, r = [], n = 0; n < e; n += 2)
+                                r[n >>> 3] |= parseInt(t.substr(n, 2), 16) << 24 - n % 8 * 4;
+                            return new s.init(r, e / 2)
+                        }
+                    }
+                        , h = a.Latin1 = {
+                        stringify: function (t) {
+                            for (var e = t.words, r = t.sigBytes, n = [], i = 0; i < r; i++) {
+                                var o = e[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+                                n.push(String.fromCharCode(o))
+                            }
+                            return n.join("")
+                        },
+                        parse: function (t) {
+                            for (var e = t.length, r = [], n = 0; n < e; n++)
+                                r[n >>> 2] |= (255 & t.charCodeAt(n)) << 24 - n % 4 * 8;
+                            return new s.init(r, e)
+                        }
+                    }
+                        , u = a.Utf8 = {
+                        stringify: function (t) {
+                            try {
+                                return decodeURIComponent(escape(h.stringify(t)))
+                            } catch (t) {
+                                throw new Error("Malformed UTF-8 data")
+                            }
+                        },
+                        parse: function (t) {
+                            return h.parse(unescape(encodeURIComponent(t)))
+                        }
+                    }
+                        , f = i.BufferedBlockAlgorithm = o.extend({
+                        reset: function () {
+                            this._data = new s.init,
+                                this._nDataBytes = 0
+                        },
+                        _append: function (t) {
+                            "string" == typeof t && (t = u.parse(t)),
+                                this._data.concat(t),
+                                this._nDataBytes += t.sigBytes
+                        },
+                        _process: function (e) {
+                            var r = this._data
+                                , n = r.words
+                                , i = r.sigBytes
+                                , o = this.blockSize
+                                , a = i / (4 * o)
+                                , c = (a = e ? t.ceil(a) : t.max((0 | a) - this._minBufferSize, 0)) * o
+                                , h = t.min(4 * c, i);
+                            if (c) {
+                                for (var u = 0; u < c; u += o)
+                                    this._doProcessBlock(n, u);
+                                var f = n.splice(0, c);
+                                r.sigBytes -= h
+                            }
+                            return new s.init(f, h)
+                        },
+                        clone: function () {
+                            var t = o.clone.call(this);
+                            return t._data = this._data.clone(),
+                                t
+                        },
+                        _minBufferSize: 0
+                    });
+                    i.Hasher = f.extend({
+                        cfg: o.extend(),
+                        init: function (t) {
+                            this.cfg = this.cfg.extend(t),
+                                this.reset()
+                        },
+                        reset: function () {
+                            f.reset.call(this),
+                                this._doReset()
+                        },
+                        update: function (t) {
+                            return this._append(t),
+                                this._process(),
+                                this
+                        },
+                        finalize: function (t) {
+                            return t && this._append(t),
+                                this._doFinalize()
+                        },
+                        blockSize: 16,
+                        _createHelper: function (t) {
+                            return function (e, r) {
+                                return new t.init(r).finalize(e)
+                            }
+                        },
+                        _createHmacHelper: function (t) {
+                            return function (e, r) {
+                                return new p.HMAC.init(t, r).finalize(e)
+                            }
+                        }
+                    });
+                    var p = n.algo = {};
+                    return n
+                }(Math)
+            }
+        ))
+            , f = (h((function (t, e) {
+                var r;
+                t.exports = (r = u,
+                    function () {
+                        var t = r
+                            , e = t.lib.WordArray;
+
+                        function n(t, r, n) {
+                            for (var i = [], o = 0, s = 0; s < r; s++)
+                                if (s % 4) {
+                                    var a = n[t.charCodeAt(s - 1)] << s % 4 * 2
+                                        , c = n[t.charCodeAt(s)] >>> 6 - s % 4 * 2;
+                                    i[o >>> 2] |= (a | c) << 24 - o % 4 * 8,
+                                        o++
+                                }
+                            return e.create(i, o)
+                        }
+
+                        t.enc.Base64 = {
+                            stringify: function (t) {
+                                var e = t.words
+                                    , r = t.sigBytes
+                                    , n = this._map;
+                                t.clamp();
+                                for (var i = [], o = 0; o < r; o += 3)
+                                    for (var s = (e[o >>> 2] >>> 24 - o % 4 * 8 & 255) << 16 | (e[o + 1 >>> 2] >>> 24 - (o + 1) % 4 * 8 & 255) << 8 | e[o + 2 >>> 2] >>> 24 - (o + 2) % 4 * 8 & 255, a = 0; a < 4 && o + .75 * a < r; a++)
+                                        i.push(n.charAt(s >>> 6 * (3 - a) & 63));
+                                var c = n.charAt(64);
+                                if (c)
+                                    for (; i.length % 4;)
+                                        i.push(c);
+                                return i.join("")
+                            },
+                            parse: function (t) {
+                                var e = t.length
+                                    , r = this._map
+                                    , i = this._reverseMap;
+                                if (!i) {
+                                    i = this._reverseMap = [];
+                                    for (var o = 0; o < r.length; o++)
+                                        i[r.charCodeAt(o)] = o
+                                }
+                                var s = r.charAt(64);
+                                if (s) {
+                                    var a = t.indexOf(s);
+                                    -1 !== a && (e = a)
+                                }
+                                return n(t, e, i)
+                            },
+                            _map: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+                        }
+                    }(),
+                    r.enc.Base64)
+            }
+        )),
+            h((function (t, e) {
+                    var r;
+                    t.exports = (r = u,
+                        function (t) {
+                            var e = r
+                                , n = e.lib
+                                , i = n.WordArray
+                                , o = n.Hasher
+                                , s = e.algo
+                                , a = [];
+                            !function () {
+                                for (var e = 0; e < 64; e++)
+                                    a[e] = 4294967296 * t.abs(t.sin(e + 1)) | 0
+                            }();
+                            var c = s.MD5 = o.extend({
+                                _doReset: function () {
+                                    this._hash = new i.init([1732584193, 4023233417, 2562383102, 271733878])
+                                },
+                                _doProcessBlock: function (t, e) {
+                                    for (var r = 0; r < 16; r++) {
+                                        var n = e + r
+                                            , i = t[n];
+                                        t[n] = 16711935 & (i << 8 | i >>> 24) | 4278255360 & (i << 24 | i >>> 8)
+                                    }
+                                    var o = this._hash.words
+                                        , s = t[e + 0]
+                                        , c = t[e + 1]
+                                        , l = t[e + 2]
+                                        , d = t[e + 3]
+                                        , v = t[e + 4]
+                                        , m = t[e + 5]
+                                        , y = t[e + 6]
+                                        , g = t[e + 7]
+                                        , _ = t[e + 8]
+                                        , b = t[e + 9]
+                                        , w = t[e + 10]
+                                        , S = t[e + 11]
+                                        , B = t[e + 12]
+                                        , T = t[e + 13]
+                                        , D = t[e + 14]
+                                        , x = t[e + 15]
+                                        , k = o[0]
+                                        , E = o[1]
+                                        , O = o[2]
+                                        , M = o[3];
+                                    k = h(k, E, O, M, s, 7, a[0]),
+                                        M = h(M, k, E, O, c, 12, a[1]),
+                                        O = h(O, M, k, E, l, 17, a[2]),
+                                        E = h(E, O, M, k, d, 22, a[3]),
+                                        k = h(k, E, O, M, v, 7, a[4]),
+                                        M = h(M, k, E, O, m, 12, a[5]),
+                                        O = h(O, M, k, E, y, 17, a[6]),
+                                        E = h(E, O, M, k, g, 22, a[7]),
+                                        k = h(k, E, O, M, _, 7, a[8]),
+                                        M = h(M, k, E, O, b, 12, a[9]),
+                                        O = h(O, M, k, E, w, 17, a[10]),
+                                        E = h(E, O, M, k, S, 22, a[11]),
+                                        k = h(k, E, O, M, B, 7, a[12]),
+                                        M = h(M, k, E, O, T, 12, a[13]),
+                                        O = h(O, M, k, E, D, 17, a[14]),
+                                        k = u(k, E = h(E, O, M, k, x, 22, a[15]), O, M, c, 5, a[16]),
+                                        M = u(M, k, E, O, y, 9, a[17]),
+                                        O = u(O, M, k, E, S, 14, a[18]),
+                                        E = u(E, O, M, k, s, 20, a[19]),
+                                        k = u(k, E, O, M, m, 5, a[20]),
+                                        M = u(M, k, E, O, w, 9, a[21]),
+                                        O = u(O, M, k, E, x, 14, a[22]),
+                                        E = u(E, O, M, k, v, 20, a[23]),
+                                        k = u(k, E, O, M, b, 5, a[24]),
+                                        M = u(M, k, E, O, D, 9, a[25]),
+                                        O = u(O, M, k, E, d, 14, a[26]),
+                                        E = u(E, O, M, k, _, 20, a[27]),
+                                        k = u(k, E, O, M, T, 5, a[28]),
+                                        M = u(M, k, E, O, l, 9, a[29]),
+                                        O = u(O, M, k, E, g, 14, a[30]),
+                                        k = f(k, E = u(E, O, M, k, B, 20, a[31]), O, M, m, 4, a[32]),
+                                        M = f(M, k, E, O, _, 11, a[33]),
+                                        O = f(O, M, k, E, S, 16, a[34]),
+                                        E = f(E, O, M, k, D, 23, a[35]),
+                                        k = f(k, E, O, M, c, 4, a[36]),
+                                        M = f(M, k, E, O, v, 11, a[37]),
+                                        O = f(O, M, k, E, g, 16, a[38]),
+                                        E = f(E, O, M, k, w, 23, a[39]),
+                                        k = f(k, E, O, M, T, 4, a[40]),
+                                        M = f(M, k, E, O, s, 11, a[41]),
+                                        O = f(O, M, k, E, d, 16, a[42]),
+                                        E = f(E, O, M, k, y, 23, a[43]),
+                                        k = f(k, E, O, M, b, 4, a[44]),
+                                        M = f(M, k, E, O, B, 11, a[45]),
+                                        O = f(O, M, k, E, x, 16, a[46]),
+                                        k = p(k, E = f(E, O, M, k, l, 23, a[47]), O, M, s, 6, a[48]),
+                                        M = p(M, k, E, O, g, 10, a[49]),
+                                        O = p(O, M, k, E, D, 15, a[50]),
+                                        E = p(E, O, M, k, m, 21, a[51]),
+                                        k = p(k, E, O, M, B, 6, a[52]),
+                                        M = p(M, k, E, O, d, 10, a[53]),
+                                        O = p(O, M, k, E, w, 15, a[54]),
+                                        E = p(E, O, M, k, c, 21, a[55]),
+                                        k = p(k, E, O, M, _, 6, a[56]),
+                                        M = p(M, k, E, O, x, 10, a[57]),
+                                        O = p(O, M, k, E, y, 15, a[58]),
+                                        E = p(E, O, M, k, T, 21, a[59]),
+                                        k = p(k, E, O, M, v, 6, a[60]),
+                                        M = p(M, k, E, O, S, 10, a[61]),
+                                        O = p(O, M, k, E, l, 15, a[62]),
+                                        E = p(E, O, M, k, b, 21, a[63]),
+                                        o[0] = o[0] + k | 0,
+                                        o[1] = o[1] + E | 0,
+                                        o[2] = o[2] + O | 0,
+                                        o[3] = o[3] + M | 0
+                                },
+                                _doFinalize: function () {
+                                    var e = this._data
+                                        , r = e.words
+                                        , n = 8 * this._nDataBytes
+                                        , i = 8 * e.sigBytes;
+                                    r[i >>> 5] |= 128 << 24 - i % 32;
+                                    var o = t.floor(n / 4294967296)
+                                        , s = n;
+                                    r[15 + (i + 64 >>> 9 << 4)] = 16711935 & (o << 8 | o >>> 24) | 4278255360 & (o << 24 | o >>> 8),
+                                        r[14 + (i + 64 >>> 9 << 4)] = 16711935 & (s << 8 | s >>> 24) | 4278255360 & (s << 24 | s >>> 8),
+                                        e.sigBytes = 4 * (r.length + 1),
+                                        this._process();
+                                    for (var a = this._hash, c = a.words, h = 0; h < 4; h++) {
+                                        var u = c[h];
+                                        c[h] = 16711935 & (u << 8 | u >>> 24) | 4278255360 & (u << 24 | u >>> 8)
+                                    }
+                                    return a
+                                },
+                                clone: function () {
+                                    var t = o.clone.call(this);
+                                    return t._hash = this._hash.clone(),
+                                        t
+                                }
+                            });
+
+                            function h(t, e, r, n, i, o, s) {
+                                var a = t + (e & r | ~e & n) + i + s;
+                                return (a << o | a >>> 32 - o) + e
+                            }
+
+                            function u(t, e, r, n, i, o, s) {
+                                var a = t + (e & n | r & ~n) + i + s;
+                                return (a << o | a >>> 32 - o) + e
+                            }
+
+                            function f(t, e, r, n, i, o, s) {
+                                var a = t + (e ^ r ^ n) + i + s;
+                                return (a << o | a >>> 32 - o) + e
+                            }
+
+                            function p(t, e, r, n, i, o, s) {
+                                var a = t + (r ^ (e | ~n)) + i + s;
+                                return (a << o | a >>> 32 - o) + e
+                            }
+
+                            e.MD5 = o._createHelper(c),
+                                e.HmacMD5 = o._createHmacHelper(c)
+                        }(Math),
+                        r.MD5)
+                }
+            )),
+            h((function (t, e) {
+                    var r, n, i, o, s, a, c, h;
+                    t.exports = (n = (r = h = u).lib,
+                        i = n.WordArray,
+                        o = n.Hasher,
+                        s = r.algo,
+                        a = [],
+                        c = s.SHA1 = o.extend({
+                            _doReset: function () {
+                                this._hash = new i.init([1732584193, 4023233417, 2562383102, 271733878, 3285377520])
+                            },
+                            _doProcessBlock: function (t, e) {
+                                for (var r = this._hash.words, n = r[0], i = r[1], o = r[2], s = r[3], c = r[4], h = 0; h < 80; h++) {
+                                    if (h < 16)
+                                        a[h] = 0 | t[e + h];
+                                    else {
+                                        var u = a[h - 3] ^ a[h - 8] ^ a[h - 14] ^ a[h - 16];
+                                        a[h] = u << 1 | u >>> 31
+                                    }
+                                    var f = (n << 5 | n >>> 27) + c + a[h];
+                                    f += h < 20 ? 1518500249 + (i & o | ~i & s) : h < 40 ? 1859775393 + (i ^ o ^ s) : h < 60 ? (i & o | i & s | o & s) - 1894007588 : (i ^ o ^ s) - 899497514,
+                                        c = s,
+                                        s = o,
+                                        o = i << 30 | i >>> 2,
+                                        i = n,
+                                        n = f
+                                }
+                                r[0] = r[0] + n | 0,
+                                    r[1] = r[1] + i | 0,
+                                    r[2] = r[2] + o | 0,
+                                    r[3] = r[3] + s | 0,
+                                    r[4] = r[4] + c | 0
+                            },
+                            _doFinalize: function () {
+                                var t = this._data
+                                    , e = t.words
+                                    , r = 8 * this._nDataBytes
+                                    , n = 8 * t.sigBytes;
+                                return e[n >>> 5] |= 128 << 24 - n % 32,
+                                    e[14 + (n + 64 >>> 9 << 4)] = Math.floor(r / 4294967296),
+                                    e[15 + (n + 64 >>> 9 << 4)] = r,
+                                    t.sigBytes = 4 * e.length,
+                                    this._process(),
+                                    this._hash
+                            },
+                            clone: function () {
+                                var t = o.clone.call(this);
+                                return t._hash = this._hash.clone(),
+                                    t
+                            }
+                        }),
+                        r.SHA1 = o._createHelper(c),
+                        r.HmacSHA1 = o._createHmacHelper(c),
+                        h.SHA1)
+                }
+            )),
+            h((function (t, e) {
+                    var r, n, i;
+                    t.exports = (n = (r = u).lib.Base,
+                        i = r.enc.Utf8,
+                        void (r.algo.HMAC = n.extend({
+                            init: function (t, e) {
+                                t = this._hasher = new t.init,
+                                "string" == typeof e && (e = i.parse(e));
+                                var r = t.blockSize
+                                    , n = 4 * r;
+                                e.sigBytes > n && (e = t.finalize(e)),
+                                    e.clamp();
+                                for (var o = this._oKey = e.clone(), s = this._iKey = e.clone(), a = o.words, c = s.words, h = 0; h < r; h++)
+                                    a[h] ^= 1549556828,
+                                        c[h] ^= 909522486;
+                                o.sigBytes = s.sigBytes = n,
+                                    this.reset()
+                            },
+                            reset: function () {
+                                var t = this._hasher;
+                                t.reset(),
+                                    t.update(this._iKey)
+                            },
+                            update: function (t) {
+                                return this._hasher.update(t),
+                                    this
+                            },
+                            finalize: function (t) {
+                                var e = this._hasher
+                                    , r = e.finalize(t);
+                                return e.reset(),
+                                    e.finalize(this._oKey.clone().concat(r))
+                            }
+                        })))
+                }
+            )),
+            h((function (t, e) {
+                    var r, n, i, o, s, a, c, h;
+                    t.exports = (n = (r = h = u).lib,
+                        i = n.Base,
+                        o = n.WordArray,
+                        s = r.algo,
+                        a = s.MD5,
+                        c = s.EvpKDF = i.extend({
+                            cfg: i.extend({
+                                keySize: 4,
+                                hasher: a,
+                                iterations: 1
+                            }),
+                            init: function (t) {
+                                this.cfg = this.cfg.extend(t)
+                            },
+                            compute: function (t, e) {
+                                for (var r = this.cfg, n = r.hasher.create(), i = o.create(), s = i.words, a = r.keySize, c = r.iterations; s.length < a;) {
+                                    h && n.update(h);
+                                    var h = n.update(t).finalize(e);
+                                    n.reset();
+                                    for (var u = 1; u < c; u++)
+                                        h = n.finalize(h),
+                                            n.reset();
+                                    i.concat(h)
+                                }
+                                return i.sigBytes = 4 * a,
+                                    i
+                            }
+                        }),
+                        r.EvpKDF = function (t, e, r) {
+                            return c.create(r).compute(t, e)
+                        }
+                        ,
+                        h.EvpKDF)
+                }
+            )),
+            h((function (t, e) {
+                    var r;
+                    t.exports = void ((r = u).lib.Cipher || function (t) {
+                        var e = r
+                            , n = e.lib
+                            , i = n.Base
+                            , o = n.WordArray
+                            , s = n.BufferedBlockAlgorithm
+                            , a = e.enc;
+                        a.Utf8;
+                        var c = a.Base64
+                            , h = e.algo.EvpKDF
+                            , u = n.Cipher = s.extend({
+                            cfg: i.extend(),
+                            createEncryptor: function (t, e) {
+                                return this.create(this._ENC_XFORM_MODE, t, e)
+                            },
+                            createDecryptor: function (t, e) {
+                                return this.create(this._DEC_XFORM_MODE, t, e)
+                            },
+                            init: function (t, e, r) {
+                                this.cfg = this.cfg.extend(r),
+                                    this._xformMode = t,
+                                    this._key = e,
+                                    this.reset()
+                            },
+                            reset: function () {
+                                s.reset.call(this),
+                                    this._doReset()
+                            },
+                            process: function (t) {
+                                return this._append(t),
+                                    this._process()
+                            },
+                            finalize: function (t) {
+                                return t && this._append(t),
+                                    this._doFinalize()
+                            },
+                            keySize: 4,
+                            ivSize: 4,
+                            _ENC_XFORM_MODE: 1,
+                            _DEC_XFORM_MODE: 2,
+                            _createHelper: function () {
+                                function t(t) {
+                                    return "string" == typeof t ? _ : y
+                                }
+
+                                return function (e) {
+                                    return {
+                                        encrypt: function (r, n, i) {
+                                            return t(n).encrypt(e, r, n, i)
+                                        },
+                                        decrypt: function (r, n, i) {
+                                            return t(n).decrypt(e, r, n, i)
+                                        }
+                                    }
+                                }
+                            }()
+                        });
+                        n.StreamCipher = u.extend({
+                            _doFinalize: function () {
+                                return this._process(!0)
+                            },
+                            blockSize: 1
+                        });
+                        var f = e.mode = {}
+                            , p = n.BlockCipherMode = i.extend({
+                            createEncryptor: function (t, e) {
+                                return this.Encryptor.create(t, e)
+                            },
+                            createDecryptor: function (t, e) {
+                                return this.Decryptor.create(t, e)
+                            },
+                            init: function (t, e) {
+                                this._cipher = t,
+                                    this._iv = e
+                            }
+                        })
+                            , l = f.CBC = function () {
+                            var e = p.extend();
+
+                            function r(e, r, n) {
+                                var i = this._iv;
+                                if (i) {
+                                    var o = i;
+                                    this._iv = t
+                                } else
+                                    o = this._prevBlock;
+                                for (var s = 0; s < n; s++)
+                                    e[r + s] ^= o[s]
+                            }
+
+                            return e.Encryptor = e.extend({
+                                processBlock: function (t, e) {
+                                    var n = this._cipher
+                                        , i = n.blockSize;
+                                    r.call(this, t, e, i),
+                                        n.encryptBlock(t, e),
+                                        this._prevBlock = t.slice(e, e + i)
+                                }
+                            }),
+                                e.Decryptor = e.extend({
+                                    processBlock: function (t, e) {
+                                        var n = this._cipher
+                                            , i = n.blockSize
+                                            , o = t.slice(e, e + i);
+                                        n.decryptBlock(t, e),
+                                            r.call(this, t, e, i),
+                                            this._prevBlock = o
+                                    }
+                                }),
+                                e
+                        }()
+                            , d = (e.pad = {}).Pkcs7 = {
+                            pad: function (t, e) {
+                                for (var r = 4 * e, n = r - t.sigBytes % r, i = n << 24 | n << 16 | n << 8 | n, s = [], a = 0; a < n; a += 4)
+                                    s.push(i);
+                                var c = o.create(s, n);
+                                t.concat(c)
+                            },
+                            unpad: function (t) {
+                                var e = 255 & t.words[t.sigBytes - 1 >>> 2];
+                                t.sigBytes -= e
+                            }
+                        };
+                        n.BlockCipher = u.extend({
+                            cfg: u.cfg.extend({
+                                mode: l,
+                                padding: d
+                            }),
+                            reset: function () {
+                                u.reset.call(this);
+                                var t = this.cfg
+                                    , e = t.iv
+                                    , r = t.mode;
+                                if (this._xformMode == this._ENC_XFORM_MODE)
+                                    var n = r.createEncryptor;
+                                else
+                                    n = r.createDecryptor,
+                                        this._minBufferSize = 1;
+                                this._mode && this._mode.__creator == n ? this._mode.init(this, e && e.words) : (this._mode = n.call(r, this, e && e.words),
+                                    this._mode.__creator = n)
+                            },
+                            _doProcessBlock: function (t, e) {
+                                this._mode.processBlock(t, e)
+                            },
+                            _doFinalize: function () {
+                                var t = this.cfg.padding;
+                                if (this._xformMode == this._ENC_XFORM_MODE) {
+                                    t.pad(this._data, this.blockSize);
+                                    var e = this._process(!0)
+                                } else
+                                    e = this._process(!0),
+                                        t.unpad(e);
+                                return e
+                            },
+                            blockSize: 4
+                        });
+                        var v = n.CipherParams = i.extend({
+                            init: function (t) {
+                                this.mixIn(t)
+                            },
+                            toString: function (t) {
+                                return (t || this.formatter).stringify(this)
+                            }
+                        })
+                            , m = (e.format = {}).OpenSSL = {
+                            stringify: function (t) {
+                                var e = t.ciphertext
+                                    , r = t.salt;
+                                if (r)
+                                    var n = o.create([1398893684, 1701076831]).concat(r).concat(e);
+                                else
+                                    n = e;
+                                return n.toString(c)
+                            },
+                            parse: function (t) {
+                                var e = c.parse(t)
+                                    , r = e.words;
+                                if (1398893684 == r[0] && 1701076831 == r[1]) {
+                                    var n = o.create(r.slice(2, 4));
+                                    r.splice(0, 4),
+                                        e.sigBytes -= 16
+                                }
+                                return v.create({
+                                    ciphertext: e,
+                                    salt: n
+                                })
+                            }
+                        }
+                            , y = n.SerializableCipher = i.extend({
+                            cfg: i.extend({
+                                format: m
+                            }),
+                            encrypt: function (t, e, r, n) {
+                                n = this.cfg.extend(n);
+                                var i = t.createEncryptor(r, n)
+                                    , o = i.finalize(e)
+                                    , s = i.cfg;
+                                return v.create({
+                                    ciphertext: o,
+                                    key: r,
+                                    iv: s.iv,
+                                    algorithm: t,
+                                    mode: s.mode,
+                                    padding: s.padding,
+                                    blockSize: t.blockSize,
+                                    formatter: n.format
+                                })
+                            },
+                            decrypt: function (t, e, r, n) {
+                                return n = this.cfg.extend(n),
+                                    e = this._parse(e, n.format),
+                                    t.createDecryptor(r, n).finalize(e.ciphertext)
+                            },
+                            _parse: function (t, e) {
+                                return "string" == typeof t ? e.parse(t, this) : t
+                            }
+                        })
+                            , g = (e.kdf = {}).OpenSSL = {
+                            execute: function (t, e, r, n) {
+                                n || (n = o.random(8));
+                                var i = h.create({
+                                    keySize: e + r
+                                }).compute(t, n)
+                                    , s = o.create(i.words.slice(e), 4 * r);
+                                return i.sigBytes = 4 * e,
+                                    v.create({
+                                        key: i,
+                                        iv: s,
+                                        salt: n
+                                    })
+                            }
+                        }
+                            , _ = n.PasswordBasedCipher = y.extend({
+                            cfg: y.cfg.extend({
+                                kdf: g
+                            }),
+                            encrypt: function (t, e, r, n) {
+                                var i = (n = this.cfg.extend(n)).kdf.execute(r, t.keySize, t.ivSize);
+                                n.iv = i.iv;
+                                var o = y.encrypt.call(this, t, e, i.key, n);
+                                return o.mixIn(i),
+                                    o
+                            },
+                            decrypt: function (t, e, r, n) {
+                                n = this.cfg.extend(n),
+                                    e = this._parse(e, n.format);
+                                var i = n.kdf.execute(r, t.keySize, t.ivSize, e.salt);
+                                return n.iv = i.iv,
+                                    y.decrypt.call(this, t, e, i.key, n)
+                            }
+                        })
+                    }())
+                }
+            )),
+            h((function (t, e) {
+                    var r;
+                    t.exports = (r = u,
+                        function () {
+                            var t = r
+                                , e = t.lib.BlockCipher
+                                , n = t.algo
+                                , i = []
+                                , o = []
+                                , s = []
+                                , a = []
+                                , c = []
+                                , h = []
+                                , u = []
+                                , f = []
+                                , p = []
+                                , l = [];
+                            !function () {
+                                for (var t = [], e = 0; e < 256; e++)
+                                    t[e] = e < 128 ? e << 1 : e << 1 ^ 283;
+                                var r = 0
+                                    , n = 0;
+                                for (e = 0; e < 256; e++) {
+                                    var d = n ^ n << 1 ^ n << 2 ^ n << 3 ^ n << 4;
+                                    d = d >>> 8 ^ 255 & d ^ 99,
+                                        i[r] = d,
+                                        o[d] = r;
+                                    var v = t[r]
+                                        , m = t[v]
+                                        , y = t[m]
+                                        , g = 257 * t[d] ^ 16843008 * d;
+                                    s[r] = g << 24 | g >>> 8,
+                                        a[r] = g << 16 | g >>> 16,
+                                        c[r] = g << 8 | g >>> 24,
+                                        h[r] = g,
+                                        g = 16843009 * y ^ 65537 * m ^ 257 * v ^ 16843008 * r,
+                                        u[d] = g << 24 | g >>> 8,
+                                        f[d] = g << 16 | g >>> 16,
+                                        p[d] = g << 8 | g >>> 24,
+                                        l[d] = g,
+                                        r ? (r = v ^ t[t[t[y ^ v]]],
+                                            n ^= t[t[n]]) : r = n = 1
+                                }
+                            }();
+                            var d = [0, 1, 2, 4, 8, 16, 32, 64, 128, 27, 54]
+                                , v = n.AES = e.extend({
+                                _doReset: function () {
+                                    if (!this._nRounds || this._keyPriorReset !== this._key) {
+                                        for (var t = this._keyPriorReset = this._key, e = t.words, r = t.sigBytes / 4, n = 4 * ((this._nRounds = r + 6) + 1), o = this._keySchedule = [], s = 0; s < n; s++)
+                                            if (s < r)
+                                                o[s] = e[s];
+                                            else {
+                                                var a = o[s - 1];
+                                                s % r ? r > 6 && s % r == 4 && (a = i[a >>> 24] << 24 | i[a >>> 16 & 255] << 16 | i[a >>> 8 & 255] << 8 | i[255 & a]) : (a = i[(a = a << 8 | a >>> 24) >>> 24] << 24 | i[a >>> 16 & 255] << 16 | i[a >>> 8 & 255] << 8 | i[255 & a],
+                                                    a ^= d[s / r | 0] << 24),
+                                                    o[s] = o[s - r] ^ a
+                                            }
+                                        for (var c = this._invKeySchedule = [], h = 0; h < n; h++)
+                                            s = n - h,
+                                                a = h % 4 ? o[s] : o[s - 4],
+                                                c[h] = h < 4 || s <= 4 ? a : u[i[a >>> 24]] ^ f[i[a >>> 16 & 255]] ^ p[i[a >>> 8 & 255]] ^ l[i[255 & a]]
+                                    }
+                                },
+                                encryptBlock: function (t, e) {
+                                    this._doCryptBlock(t, e, this._keySchedule, s, a, c, h, i)
+                                },
+                                decryptBlock: function (t, e) {
+                                    var r = t[e + 1];
+                                    t[e + 1] = t[e + 3],
+                                        t[e + 3] = r,
+                                        this._doCryptBlock(t, e, this._invKeySchedule, u, f, p, l, o),
+                                        r = t[e + 1],
+                                        t[e + 1] = t[e + 3],
+                                        t[e + 3] = r
+                                },
+                                _doCryptBlock: function (t, e, r, n, i, o, s, a) {
+                                    for (var c = this._nRounds, h = t[e] ^ r[0], u = t[e + 1] ^ r[1], f = t[e + 2] ^ r[2], p = t[e + 3] ^ r[3], l = 4, d = 1; d < c; d++) {
+                                        var v = n[h >>> 24] ^ i[u >>> 16 & 255] ^ o[f >>> 8 & 255] ^ s[255 & p] ^ r[l++]
+                                            , m = n[u >>> 24] ^ i[f >>> 16 & 255] ^ o[p >>> 8 & 255] ^ s[255 & h] ^ r[l++]
+                                            , y = n[f >>> 24] ^ i[p >>> 16 & 255] ^ o[h >>> 8 & 255] ^ s[255 & u] ^ r[l++]
+                                            , g = n[p >>> 24] ^ i[h >>> 16 & 255] ^ o[u >>> 8 & 255] ^ s[255 & f] ^ r[l++];
+                                        h = v,
+                                            u = m,
+                                            f = y,
+                                            p = g
+                                    }
+                                    v = (a[h >>> 24] << 24 | a[u >>> 16 & 255] << 16 | a[f >>> 8 & 255] << 8 | a[255 & p]) ^ r[l++],
+                                        m = (a[u >>> 24] << 24 | a[f >>> 16 & 255] << 16 | a[p >>> 8 & 255] << 8 | a[255 & h]) ^ r[l++],
+                                        y = (a[f >>> 24] << 24 | a[p >>> 16 & 255] << 16 | a[h >>> 8 & 255] << 8 | a[255 & u]) ^ r[l++],
+                                        g = (a[p >>> 24] << 24 | a[h >>> 16 & 255] << 16 | a[u >>> 8 & 255] << 8 | a[255 & f]) ^ r[l++],
+                                        t[e] = v,
+                                        t[e + 1] = m,
+                                        t[e + 2] = y,
+                                        t[e + 3] = g
+                                },
+                                keySize: 8
+                            });
+                            t.AES = e._createHelper(v)
+                        }(),
+                        r.AES)
+                }
+            )))
+            , p = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+        function l(t) {
+            var e, r, n = "";
+            for (e = 0; e + 3 <= t.length; e += 3)
+                r = parseInt(t.substring(e, e + 3), 16),
+                    n += p.charAt(r >> 6) + p.charAt(63 & r);
+            for (e + 1 === t.length ? (r = parseInt(t.substring(e, e + 1), 16),
+                n += p.charAt(r << 2)) : e + 2 === t.length && (r = parseInt(t.substring(e, e + 2), 16),
+                n += p.charAt(r >> 2) + p.charAt((3 & r) << 4)); (3 & n.length) > 0;)
+                n += "=";
+            return n
+        }
+
+        var d, v = (d = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+-/",
+                function (t) {
+                    for (var e = []; t > 0;)
+                        e.push(d.charAt(Math.floor(Math.random() * (d.length + 1)))),
+                            t--;
+                    return e.join("")
+                }
+        );
+
+        class m {
+            constructor(t) {
+                this.env = t
+            }
+
+            async request(e) {
+                const r = this.prepare(e)
+                    , n = this.env.getCredential();
+                if (n && await n.WaitForReady(),
+                Array.isArray(e.encryption) && !this.env.isSecure())
+                    try {
+                        await this.encryptParams(r, e.encryption)
+                    } catch {
+                    }
+                try {
+                    return await this.doRequest(r)
+                } catch (r) {
+                    return t(i = r) && 119 === i.code && t(i.errors) && "session hash invalid." === i.errors.reason && n ? (await n.Resume(),
+                        this.request(e)) : Promise.reject(r)
+                }
+                var i
+            }
+
+            encrypt(t, r = {}, cipher) {
+                t = JSON.parse(JSON.stringify(t));
+                const n = {
+                    ...r,
+                    params: t
+                };
+                return this.encryptParams(n, Object.keys(t),cipher).then((() => {
+                        const t = n.params;
+                        if ("raw" !== r.requestFormat)
+                            for (const r in t)
+                                e(t, r) && (t[r] = JSON.stringify(t[r]));
+                        return t
+                    }
+                ))
+            }
+
+            createRequestConfig(t) {
+                var e;
+                return (e = "webapi" === t.requestFormat ? Object.assign(g(t), y(t.params)) : t.params) && e.compound && (e.compound = JSON.stringify(JSON.parse(e.compound).map((function (t) {
+                        var e = Object.assign({}, t, t.params);
+                        return delete e.params,
+                            e
+                    }
+                )))),
+                    {
+                        url: t.url || this.env.getBaseURL() + "webapi/entry.cgi/" + t.api,
+                        method: t.requestMethod,
+                        params: e,
+                        headers: this.getHeaders(t),
+                        options: t,
+                        timeout: t.timeout,
+                        signal: t.signal
+                    }
+            }
+
+            prepare(t) {
+                var e = t.compound;
+                let r;
+                if (e) {
+                    var n = e.params || [];
+                    r = {
+                        api: "SYNO.Entry.Request",
+                        method: "request",
+                        version: 1,
+                        params: {
+                            stop_when_error: !0 === e.stopwhenerror,
+                            mode: "parallel" === e.mode ? e.mode : "sequential",
+                            compound: n.map(_)
+                        }
+                    }
+                } else
+                    r = _(t);
+                return {
+                    ...r,
+                    headers: t.headers,
+                    url: t.url,
+                    requestFormat: t.requestFormat ? t.requestFormat.toLowerCase() : "webapi",
+                    requestMethod: t.requestMethod || "POST",
+                    responseFormat: t.responseFormat ? t.responseFormat.toLowerCase() : "webapi",
+                    timeout: t.timeout,
+                    signal: t.signal
+                }
+            }
+
+            doRequest(e) {
+                return new Promise(((n, i) => {
+                        this.requestAdapter(this.createRequestConfig(e), ((e, o, s) => {
+                                if (o)
+                                    try {
+                                        s = JSON.parse(s)
+                                    } catch (t) {
+                                    }
+                                var a = !1
+                                    , c = null;
+                                return "raw" === e.responseFormat ? (a = o,
+                                    c = s) : t(s) ? c = (a = s.success) ? s.data : s.error : r(s) && (a = !1,
+                                    c = s),
+                                    a ? n(c) : i(c)
+                            }
+                        ))
+                    }
+                ))
+            }
+
+            encryptParams(t, r, cipher) {
+                if (!r || 0 === r.length)
+                    return Promise.resolve();
+                let i = !1;
+
+                function o(o, s, a) {
+                    if (o.params) {
+                        for (var h = Object.assign({}, o.params), u = {}, p = !1, d = 0; d < r.length; d++) {
+                            var m = r[d];
+                            if (e(o.params, m)) {
+                                var g = o.params[m];
+                                "raw" !== t.requestFormat && (g = "string" == typeof g ? JSON.stringify(g) : g),
+                                    u[m] = g,
+                                    delete h[m],
+                                    p = !0
+                            }
+                        }
+                        if (p) {
+                            var _ = function (t, e) {
+                                var r = e.cipherKey
+                                    , i = e.publicKey
+                                    , o = e.cipherToken
+                                    , s = e.timeBias;
+                                if (!r || !i || !o)
+                                    return t;
+                                var a = new c;
+                                a.setPublic(i, "10001");
+                                var h = v(501)
+                                    , u = a.encrypt(h);
+                                if (!u)
+                                    return t;
+                                var p = {};
+                                p[o] = Math.floor(Date.now() / 1e3) + s,
+                                    Object.assign(p, t);
+                                var d = f.encrypt(n(p), h).toString();
+                                if (!d)
+                                    return t;
+                                var m = {};
+                                return m[r] = {
+                                    rsa: l(u),
+                                    aes: d
+                                },
+                                    m
+                            }(u, s);
+                            _[s.cipherKey] || (i = !0),
+                            "raw" === t.requestFormat && (_ = y(_)),
+                            a && (_ = y(_)),
+                                o.params = Object.assign(h, _)
+                        }
+                    }
+                }
+
+                const s = {
+                    api: "SYNO.API.Encryption",
+                    method: "getinfo",
+                    version: 1
+                }
+                    , a = this.env.isLegacyMode();
+
+                o(t, cipher, !1)
+                return Promise.resolve()
+                // return this.doRequest({
+                //     ...a ? {
+                //         url: this.env.getBaseURL() + "webapi/encryption.cgi/SYNO.API.Encryption",
+                //         params: {
+                //             ...s,
+                //             format: "module"
+                //         },
+                //         requestFormat: "raw"
+                //     } : {
+                //         ...s,
+                //         params: {
+                //             format: "module"
+                //         }
+                //     },
+                //     headers: t.headers
+                // }).then((e => {
+                //         const r = {
+                //             cipherKey: e.cipherkey,
+                //             publicKey: e.public_key,
+                //             cipherToken: e.ciphertoken,
+                //             timeBias: e.server_time - Math.floor(Date.now() / 1e3)
+                //         }
+                //             , n = t.params.compound;
+                //         if (n)
+                //             return new Promise((t => {
+                //                     let e = 0;
+                //                     !function i() {
+                //                         for (var s = Math.min(n.length, e + 5); e < s; e++)
+                //                             o(n[e], r, !0);
+                //                         e < n.length ? setTimeout(i, 80) : t()
+                //                     }()
+                //                 }
+                //             ));
+                //         o(t, r, !1)
+                //     }
+                // )).then((() => i ? Promise.reject() : Promise.resolve()))
+            }
+
+            getHeaders(t) {
+                return Object.assign({
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                }, this.env.getRequestHeaders(), t.headers)
+            }
+
+            createAuthConfig(t) {
+                const e = {
+                    api: "SYNO.API.Auth",
+                    version: t.version || 6,
+                    method: t.method || "login"
+                }
+                    , r = Object.keys(t).filter((t => -1 === ["callback", "scope"].indexOf(t))).reduce(((e, r) => (e[r] = t[r],
+                    e)), {});
+                let n = this.env.getBaseURL();
+                if (this.env.isLegacyMode()) {
+                    n += "webapi/auth.cgi";
+                    const e = t.enable_syno_token;
+                    e && (n += "?enable_syno_token=" + e)
+                } else
+                    n += "webapi/entry.cgi/" + e.api;
+                const {encryption: i = []} = t;
+                return "login" === e.method && i.push("passwd"),
+                    {
+                        url: n,
+                        params: {
+                            ...r,
+                            ...e
+                        },
+                        requestFormat: "raw",
+                        encryption: i
+                    }
+            }
+
+            auth(t) {
+                return this.request(this.createAuthConfig(t))
+            }
+
+            requestAdapter() {
+            }
+        }
+
+        function y(t) {
+            var r = {};
+            for (var n in t)
+                e(t, n) && (r[n] = JSON.stringify(t[n]));
+            return r
+        }
+
+        function g(t) {
+            return {
+                api: t.api,
+                method: t.method,
+                version: t.version
+            }
+        }
+
+        function _(t) {
+            var e = g(t);
+            return t.params && (e.params = t.params),
+                e
+        }
+
+        class b {
+            constructor() {
+                this.aborted = !1,
+                    this._handlers = {}
+            }
+
+            addEventListener(t, e) {
+                this._handlers[t] || (this._handlers[t] = []),
+                    this._handlers[t].push(e)
+            }
+
+            removeEventListener(t, e) {
+                const r = this._handlers[t];
+                if (!r)
+                    return;
+                const n = r.indexOf(e);
+                n > -1 && r.splice(n, 1)
+            }
+
+            emit(t) {
+                const e = this._handlers[t];
+                e && e.forEach((t => t()))
+            }
+        }
+
+        class w {
+            constructor() {
+                this.signal = new b
+            }
+
+            abort() {
+                const t = this.signal;
+                t.aborted || (t.emit("abort"),
+                    t.aborted = !0)
+            }
+        }
+
+        function S(t) {
+            return {
+                env: t.env
+            }
+        }
+
+        function B(t, e) {
+            const r = e.callback || function () {
+            }
+                , n = e.scope;
+            t.then((t => {
+                    r.call(n, !0, t)
+                }
+            ), (t => {
+                    r.call(n, !1, t)
+                }
+            ))
+        }
+
+        function T(t) {
+            return {
+                ...S(t),
+                request(e) {
+                    B(t.request(e), e)
+                },
+                auth(e, r, n) {
+                    r && (e = {
+                        ...e,
+                        callback: r,
+                        scope: n
+                    }),
+                        B(t.auth(e), e)
+                },
+                download(e) {
+                    t.download(e)
+                },
+                encrypt(e, r, n, i) {
+                    "function" == typeof r && (i = n,
+                        n = r,
+                        r = {}),
+                        B(t.encrypt(e, r), {
+                            callback: n,
+                            scope: i
+                        })
+                }
+            }
+        }
+
+        function D(t) {
+            return {
+                ...x(t),
+                create: (...e) => x(t.create(...e))
+            }
+        }
+
+        function x(t) {
+            const e = S(t);
+            return ["request", "auth", "download", "encrypt"].forEach((r => {
+                    e[r] = t[r].bind(t)
+                }
+            )),
+                e
+        }
+
+        class k extends m {
+            requestAdapter(t, r) {
+                return function (t, r) {
+                    var i = new XMLHttpRequest
+                        , o = t.url
+                        , s = t.method || "POST"
+                        , a = n(t.params)
+                        , c = !!t.formData
+                        , h = "";
+                    const u = t.signal;
+
+                    function f() {
+                        i.abort()
+                    }
+
+                    function p(e, n) {
+                        u && u.removeEventListener("abort", f),
+                            r(t.options, e, n)
+                    }
+
+                    function l() {
+                        p(!1, new Error("aborted"))
+                    }
+
+                    if (u && u.aborted)
+                        l();
+                    else {
+                        if (a.length > 0 && ("GET" === s || c ? o += "?" + a : h = a),
+                            c)
+                            for (var d in h = new FormData,
+                                t.formData)
+                                e(t.formData, d) && h.append(d, t.formData[d]);
+                        for (var v in i.open(s, o, !0),
+                        "number" == typeof t.timeout && (i.timeout = t.timeout),
+                            i.ontimeout = function () {
+                                p(!1, new Error("timeout"))
+                            }
+                            ,
+                            i.onload = function () {
+                                p(200 === i.status, i.response)
+                            }
+                            ,
+                            i.onerror = function () {
+                                p(!1, i.response)
+                            }
+                            ,
+                            i.onabort = l,
+                        t.onDownloadProgress && i.addEventListener("progress", t.onDownloadProgress),
+                        t.onUploadProgress && i.upload && i.upload.addEventListener("progress", t.onUploadProgress),
+                        u && u.addEventListener("abort", f),
+                            t.headers)
+                            c && "POST" === s && "Content-Type" === v || i.setRequestHeader(v, t.headers[v]);
+                        i.send(h)
+                    }
+                }(t, r)
+            }
+
+            prepare(t) {
+                return {
+                    ...super.prepare(t),
+                    formData: t.formData,
+                    onDownloadProgress: t.onDownloadProgress,
+                    onUploadProgress: t.onUploadProgress
+                }
+            }
+
+            createRequestConfig(t) {
+                return {
+                    ...super.createRequestConfig(t),
+                    formData: t.formData,
+                    onDownloadProgress: t.onDownloadProgress,
+                    onUploadProgress: t.onUploadProgress
+                }
+            }
+        }
+
+        function E(t, r) {
+            var i = t.url
+                , o = t.method || "GET"
+                , s = t.params || {}
+                , a = null;
+            "GET" === o ? i += "?" + n(s) : "POST" === o && (i = q && "https:" === location.protocol ? 'javascript:""' : "about:blank");
+            var c, h, u, f = (c = i,
+                h = document.createElement("iframe"),
+                u = "synowebapi-iframe-" + O++,
+                h.setAttribute("src", c),
+                h.setAttribute("frameBorder", "0"),
+                h.setAttribute("id", u),
+                h.setAttribute("name", u),
+                h.setAttribute("style", "border:0px none;width:0;height:0;position:absolute;top:-100000px"),
+                document.body.appendChild(h),
+                h);
+
+            function p() {
+                return f.contentWindow ? f.contentWindow.document || f.contentDocument : f.contentDocument || window.frames[f.id].document
+            }
+
+            "POST" === o && (a = function (t, r) {
+                var n = document.createElement("form");
+                n.name = "dlform",
+                    n.method = "POST";
+                var i = r.SynoToken;
+                i && (t += "?SynoToken=" + i,
+                    delete (r = Object.assign({}, r)).SynoToken);
+                for (var o in n.action = t,
+                    r)
+                    if (e(r, o)) {
+                        var s = document.createElement("input");
+                        s.type = "hidden",
+                            s.name = o,
+                            s.value = r[o],
+                            n.appendChild(s)
+                    }
+                return n
+            }(t.url, s),
+                p().body.appendChild(a));
+            var l = null;
+
+            function d(e, n) {
+                l && (clearTimeout(l),
+                    l = null),
+                r && r(t.options, "load" === e, n),
+                    setTimeout((function () {
+                            try {
+                                document.body.removeChild(f)
+                            } catch (t) {
+                            }
+                        }
+                    ), 100)
+            }
+
+            t.timeout && (l = setTimeout((function () {
+                    d("timeout", new Error("timeout"))
+                }
+            ), t.timeout)),
+                f.addEventListener("load", (function () {
+                        var t = p().body.firstChild;
+                        d("load", t && t.innerHTML)
+                    }
+                ), {
+                    once: !0
+                }),
+                f.addEventListener("error", (function () {
+                        d("error")
+                    }
+                ), {
+                    once: !0
+                }),
+            a && (a.submit(),
+                a.parentNode.removeChild(a))
+        }
+
+        var O = 0;
+        var M, R, C, A, q = (M = navigator.userAgent.toLowerCase(),
+            R = /msie/.test(M),
+            C = /trident\/7/.test(M),
+        R || C);
+
+        class P extends m {
+            constructor(t, e) {
+                super(t),
+                    this.xhrRelayTarget = e
+            }
+
+            request(t) {
+                super.request(t).catch((e => {
+                        r(e) && "timeout" === e.message || t.onError && t.onError.call(t.scope, e)
+                    }
+                ))
+            }
+
+            requestAdapter(t, e) {
+                return E(t, e)
+            }
+
+            createRequestConfig(t) {
+                var e = super.createRequestConfig(t);
+                e.header = null;
+                var r = this.env.getSynoToken();
+                return r && (e.params = Object.assign({}, e.params, {
+                    SynoToken: r
+                })),
+                    e
+            }
+
+            prepare(t) {
+                var e, r;
+                return {
+                    ...super.prepare(t),
+                    requestMethod: null != (e = t.requestMethod) ? e : "GET",
+                    timeout: null != (r = t.timeout) ? r : 12e4
+                }
+            }
+
+            encryptParams(t, e) {
+                return this.xhrRelayTarget ? this.xhrRelayTarget.encryptParams(t, e) : super.encryptParams(t, e)
+            }
+        }
+
+        class z extends class {
+            constructor(t = Object.create(null)) {
+                const {baseURL: e, synotoken: r, isSecure: n, legacyMode: i = !0} = t;
+                this.baseURL = e || "",
+                    this.synoToken = r || "",
+                    this.forceSecure = n,
+                    this.legacyMode = i,
+                    this.credential = null
+            }
+
+            getBaseURL() {
+                return this.baseURL
+            }
+
+            setBaseURL(t) {
+                this.baseURL = t
+            }
+
+            getSynoToken() {
+                return this.synoToken
+            }
+
+            setSynoToken(t) {
+                this.synoToken = t
+            }
+
+            _isSecure() {
+                return this.getBaseURL().startsWith("https:")
+            }
+
+            isSecure() {
+                const t = this.forceSecure;
+                return "boolean" == typeof t ? t : this._isSecure()
+            }
+
+            setLegacyMode(t) {
+                this.legacyMode = t
+            }
+
+            isLegacyMode() {
+                return this.legacyMode
+            }
+
+            setCredential(t) {
+                this.credential = t
+            }
+
+            getCredential() {
+                return this.credential
+            }
+
+            getRequestHeaders() {
+                const t = {};
+                return this.synoToken && (t["X-SYNO-TOKEN"] = this.synoToken),
+                this.credential && Object.assign(t, this.credential.GetRequestHeaders()),
+                    t
+            }
+        } {
+            _isSecure() {
+                const t = this.getBaseURL();
+                return (/^https?:\/\//.test(t) ? t : location.protocol).startsWith("https:")
+            }
+        }
+
+        return {
+            ...T(A = new class extends class {
+                    constructor(t) {
+                    }
+
+                    get env() {
+                        return this.manager.env
+                    }
+
+                    request(t) {
+                        return this.manager.request(t)
+                    }
+
+                    auth(t) {
+                        return this.manager.auth(t)
+                    }
+
+                    download(t) {
+                        t.onError && t.onError(new Error("unsupported"))
+                    }
+
+                    encrypt(t, e, cipher) {
+                        return this.manager.encrypt(t, e, cipher)
+                    }
+
+                    create(t) {
+                        return new this.constructor(t)
+                    }
+                } {
+                    constructor(t = Object.create(null)) {
+                        super();
+                        const e = new z(t);
+                        this.manager = new k(e),
+                            this.downloader = new P(e, this.manager)
+                    }
+
+                    download(t) {
+                        this.downloader.request(t)
+                    }
+                }
+            ),
+            create: (...t) => T(A.create(...t)),
+            promises: D(A),
+            AbortController: {
+                create: () => new w
+            }
+        }
+    }();
+
+</script>
+<script>
+let cipher = {
+        cipherKey: "__cIpHeRtExT",
+        cipherToken: "__cIpHeRtOkEn",
+        publicKey: "D6D3A66F381A8DE82F7CD0801EF4AD6D1D641FAAAD09C5040B53613F68261E59E1C3C87063A07F11EC95A649987A69167D3D6A48F8D7E9E4756783C0B8ABB9EBCEF8FDE0DCF9B063E7D6FE86F012D41630EE7B0F80B7D5239DAD0797F514BC285F28CE47CCB477760AE90B2C7738F8EE17F540A0B6D161B4ED5CD0A015D057652F44D154AE81A8920A51215908F3C803A04D371A88E9C62B7D4629D3EB33E29282F52FE206F4C28EDDB85A1015009B415C7299340044271FA85526C1CFF84369B9DA642AA3C0DCD23A63DFC0502F724D25A9506F8C989FD88FDE7600C83C0C7D0EC145D024AAFB8B9381F80893B2211365233D2658D3B406A47EFEEF1818FDE313F7CBE30C3333130A46DBD377EECA6E0593D3A9FDC1F4D14A4DFADBDAF14A3F0FA5E1D5789E6D30C0EDAE90EE3D94CA892BD52312B742A55026A54F3825D060FBE32372010F17FB1E42E7809930BBE8E0C43E4F1611D9AB32021DD4F0AFEB0721D374BE9FB623AB253EBB92DF5990CC8D909614F7B2BD01A03DB5E7B534586C4AE5AA2806B14E0F4749593FCB6C7AEC3BCFEA78DD32687342CE13DB3835E5F78EB36572E4F3269079F529483C4D43EA209BF2124ACB5477112F46BBE26C572564B6EFDC524BC3678F826FDEB9494EB99F8168B0A4D77D454E635BF194688E0BA3FD2A32BFDC53BDFC497CC0F40331FE1A9F86EC4658BD979DE6619ECD77616B",
+        timeBias: 0
+    }
+    let params = {
+        account: "account",
+        enable_device_token: "no",
+        logintype: "local",
+        otp_code: "",
+        passwd: "123",
+        rememberme: 0,
+        timezone: "+08:00",
+    };
+    function encrypt(){
+        synowebapi.promises.encrypt(param, {requestFormat: "raw",}, cipher).then((res)=>{
+            onEncrypted.postMessage(res)
+        })
+    }
+</script>
+
+
+</body>
+</html>

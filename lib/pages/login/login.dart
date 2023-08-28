@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:dsm_app/apis/api.dart';
 import 'package:dsm_app/apis/dsm_api/dsm_resopnse.dart';
@@ -9,6 +10,7 @@ import 'package:dsm_app/database/tables.dart';
 import 'package:dsm_app/models/SYNO/API/auth_model.dart';
 import 'package:dsm_app/models/SYNO/SDS/Session/session_data_model.dart';
 import 'package:dsm_app/pages/dashboard/dashboard.dart';
+import 'package:dsm_app/pages/index/index.dart';
 import 'package:dsm_app/pages/server/select_server.dart';
 import 'package:dsm_app/utils/db_utils.dart';
 import 'package:dsm_app/utils/extensions/datetime_ext.dart';
@@ -21,6 +23,7 @@ import 'package:dsm_app/widgets/custom_dialog/custom_dialog.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class Login extends StatefulWidget {
   const Login(this.server, {super.key});
@@ -30,6 +33,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  late WebViewController webViewController;
   final TextEditingController _accountController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _otpCodeController = TextEditingController();
@@ -40,11 +44,29 @@ class _LoginState extends State<Login> {
   bool loading = false;
   bool showPassword = false;
   bool isDefault = false;
-
+  String cipherStr = "";
   SessionDataModel? sessionDataModel;
 
   @override
   void initState() {
+    webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadFlutterAsset("assets/html/syno_web_api.html")
+      ..addJavaScriptChannel("onEncrypted", onMessageReceived: (v) {
+        String message = v.message;
+        message = message.replaceAll("__cIpHeRtExT", '"__cIpHeRtExT"');
+        print(json.decode(message));
+        cipherStr = jsonEncode(json.decode(message)['__cIpHeRtExT']);
+        login();
+      })
+      ..addJavaScriptChannel(
+        'Toaster',
+        onMessageReceived: (JavaScriptMessage message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message.message)),
+          );
+        },
+      );
     getSessionData();
     super.initState();
   }
@@ -71,33 +93,68 @@ class _LoginState extends State<Login> {
     } catch (e) {}
   }
 
-  login() async {
-    //测试加密解密
-    // final key = encrypt.Key.fromUtf8(
-    //     "D6D3A66F381A8DE82F7CD0801EF4AD6D1D641FAAAD09C5040B53613F68261E59E1C3C87063A07F11EC95A649987A69167D3D6A48F8D7E9E4756783C0B8ABB9EBCEF8FDE0DCF9B063E7D6FE86F012D41630EE7B0F80B7D5239DAD0797F514BC285F28CE47CCB477760AE90B2C7738F8EE17F540A0B6D161B4ED5CD0A015D057652F44D154AE81A8920A51215908F3C803A04D371A88E9C62B7D4629D3EB33E29282F52FE206F4C28EDDB85A1015009B415C7299340044271FA85526C1CFF84369B9DA642AA3C0DCD23A63DFC0502F724D25A9506F8C989FD88FDE7600C83C0C7D0EC145D024AAFB8B9381F80893B2211365233D2658D3B406A47EFEEF1818FDE313F7CBE30C3333130A46DBD377EECA6E0593D3A9FDC1F4D14A4DFADBDAF14A3F0FA5E1D5789E6D30C0EDAE90EE3D94CA892BD52312B742A55026A54F3825D060FBE32372010F17FB1E42E7809930BBE8E0C43E4F1611D9AB32021DD4F0AFEB0721D374BE9FB623AB253EBB92DF5990CC8D909614F7B2BD01A03DB5E7B534586C4AE5AA2806B14E0F4749593FCB6C7AEC3BCFEA78DD32687342CE13DB3835E5F78EB36572E4F3269079F529483C4D43EA209BF2124ACB5477112F46BBE26C572564B6EFDC524BC3678F826FDEB9494EB99F8168B0A4D77D454E635BF194688E0BA3FD2A32BFDC53BDFC497CC0F40331FE1A9F86EC4658BD979DE6619ECD77616B");
-    // final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    // String aes = "U2FsdGVkX19Crg9a07oLjZZa6uRU42MO4zEvQIOQmbTGi3g68AKGKFHvbfsqElyvZh2srQzLRVW5+xuasO1R097XKYVCxSHKlbmANo8WWKm73q/gAgdFS0r+XpqyPZaanQSmZgwVTvrgRw1rxzPJMkAmWI0tRa5P5scwn8oionDIsN23wvQ2lpKVV0hUOMpCAbC364+BlHmke2xHqiIZYA==";
-    // String rsa = "";
-    // encrypt.Encrypted encrypted = encrypt.Encrypted.fromUtf8(aes);
-    // final decrypted = encrypter.decrypt(encrypted, iv: encrypt.IV.fromUtf8("__cIpHeRtOkEn"));
-    // print(decrypted);
-    // return;
+  encrypt() async {
     setState(() {
       loading = true;
     });
+    var res = await Api.dsm.post('/webapi/encryption.cgi/SYNO.API.Encryption', data: {
+      "api": "SYNO.API.Encryption",
+      "method": "getinfo",
+      "version": 1,
+      "format": "module",
+    });
+    print(res);
+
+    var cipher = {
+      "cipherKey": res['data']['cipherkey'],
+      "cipherToken": res['data']['ciphertoken'],
+      "publicKey": res['data']['public_key'],
+      "timeBias": res['data']['server_time'] - DateTime.now().secondsSinceEpoch,
+    };
+    var params = {
+      "account": account,
+      "enable_device_token": "no",
+      "logintype": "local",
+      "otp_code": "",
+      "passwd": password,
+      "rememberme": 1,
+      "timezone": "+08:00",
+    };
+
+    webViewController.runJavaScript('''synowebapi.promises.encrypt(${json.encode(params)}, {requestFormat: "raw",}, ${json.encode(cipher)}).then((res)=>{
+      onEncrypted.postMessage(res)
+    })''');
+  }
+
+  login() async {
+    setState(() {
+      loading = true;
+    });
+
     try {
       Map<String, dynamic> data = {
-        "account": account,
-        "passwd": password,
-        "logintype": 'local',
-        "otp_code": otpCode,
         "session": "webui",
         "tabid": 54053,
-        "enable_device_token": rememberDevice ? "yes" : "no",
         "enable_sync_token": "yes",
-        // "ik_message": "LC6e3eUUEscf8ghrnxr1jadv37rCdAcur9LcgRUtGEXhqdd98sADwZMZtEmeTeACKbS5d-RkzpkezlSX3rBVk1KftOfsmt7Ap1t1oWpIevL47Vg9vX-37hCUHvQo2nNI",
+        "ik_message": "LC6e3eUUEscf8ghrnxr1jadv37rCdAcur9LcgRUtGEXhqdd98sADwZMZtEmeTeACKbS5d-RkzpkezlSX3rBVk1KftOfsmt7Ap1t1oWpIevL47Vg9vX-37hCUHvQo2nNI",
+        "__cIpHeRtExT": cipherStr,
+        "client": "browser",
       };
-      DsmResponse res = await Api.dsm.entry<AuthModel>("SYNO.API.Auth", "login", post: true, data: data, parser: (json) {
+      DsmResponse res = await Api.dsm.entry<AuthModel>("SYNO.API.Auth", "login",
+          post: true,
+          data: data,
+          parameters: {
+            "api": "SYNO.API.Auth",
+          },
+          //VGM9B-51wzM2p6SWuzOkeHXbl8lLzgqbN8sBTk4W-00xalNTUzaM3CJgpurSiAxbdvXu18woyjkEXL375JNX9g
+          options: Options(headers: {
+            "Host": "pan.apaipai.top:5000",
+            "Origin": "http://pan.apaipai.top:5000",
+            "Proxy-Connection": "keep-alive",
+            "Referer": "http://pan.apaipai.top:5000/",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36 Edg/114.0.1823.79",
+            "Cookies": "_SSID=ZaUZxVertjUHJma-bbmpTd_YCOQLDcWOFu8pLwbmPXI; did=VGM9B-51wzM2p6SWuzOkeHXbl8lLzgqbN8sBTk4W-00xalNTUzaM3CJgpurSiAxbdvXu18woyjkEXL375JNX9g; stay_login=1"
+          }), parser: (json) {
         return AuthModel.fromJson(json);
       });
       if (res.success ?? false) {
@@ -117,7 +174,7 @@ class _LoginState extends State<Login> {
                 synoToken: authModel.synotoken!,
               ),
             );
-        context.push(Dashboard(), replace: true);
+        context.push(Index(), replace: true);
       } else if (res.error?['code'] == 400) {
         Util.showToast("用户名/密码有误");
       } else if (res.error?['code'] == 403) {
@@ -239,24 +296,37 @@ class _LoginState extends State<Login> {
                   fit: BoxFit.cover,
                 ),
               ),
-            if (sessionDataModel?.loginWelcomeTitle != null || sessionDataModel?.loginFooterMsg != null && sessionDataModel?.loginFooterEnableHtml == false)
+            if (sessionDataModel?.loginWelcomeTitle != null || sessionDataModel?.loginWelcomeMsg != null)
               Positioned(
-                  left: 20,
-                  top: context.width / 16 * 9 / 2 - 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (sessionDataModel?.loginWelcomeTitle != null)
-                        Text(
-                          "${sessionDataModel?.loginWelcomeTitle}",
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
-                        ),
-                      if (sessionDataModel?.loginFooterMsg != null && sessionDataModel?.loginFooterEnableHtml == false)
-                        Text(
-                          "${sessionDataModel?.loginFooterMsg}",
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white),
-                        ),
-                    ],
+                left: 20,
+                top: context.width / 16 * 9 / 2 - 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (sessionDataModel?.loginWelcomeTitle != null)
+                      Text(
+                        "${sessionDataModel?.loginWelcomeTitle}",
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                      ),
+                    if (sessionDataModel?.loginWelcomeMsg != null)
+                      Text(
+                        "${sessionDataModel?.loginWelcomeMsg}",
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white),
+                      ),
+                  ],
+                ),
+              ),
+            if (sessionDataModel?.loginFooterMsg != null && sessionDataModel?.loginFooterEnableHtml == false)
+              Positioned(
+                  top: context.width / 16 * 9 - 70,
+                  child: SizedBox(
+                    width: context.width,
+                    child: Center(
+                      child: Text(
+                        "${sessionDataModel?.loginFooterMsg}",
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white),
+                      ),
+                    ),
                   )),
             Positioned(
               top: 200,
@@ -409,10 +479,17 @@ class _LoginState extends State<Login> {
                           child: Button(
                             child: Text("登录"),
                             loading: loading,
-                            onPressed: login,
+                            onPressed: encrypt,
                           ),
                         ),
                       ],
+                    ),
+                    Container(
+                      height: 100,
+                      color: Colors.red,
+                      child: WebViewWidget(
+                        controller: webViewController,
+                      ),
                     ),
                   ],
                 ),

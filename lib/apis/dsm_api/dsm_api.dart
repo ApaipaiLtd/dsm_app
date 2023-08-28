@@ -22,7 +22,7 @@ class DsmApi extends HttpUtil {
   }) async {
     late Response response;
     data = data ?? {};
-    data['version'] = ApiModel.apiInfo['SYNO.API.Auth']?.version;
+    data['version'] = ApiModel.apiInfo[api]?.version ?? 1;
     data['api'] = api;
     data['method'] = method;
     if (post) {

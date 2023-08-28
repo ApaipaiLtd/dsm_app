@@ -128,6 +128,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/html/
     - assets/tabbar/
     - assets/icons/
     - assets/devices/

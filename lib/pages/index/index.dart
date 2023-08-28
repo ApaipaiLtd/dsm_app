@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:dsm_app/apis/api.dart';
+import 'package:dsm_app/utils/extensions/media_query_ext.dart';
 import 'package:dsm_app/widgets/button.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -52,13 +54,97 @@ class _IndexState extends State<Index> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       // backgroundColor: Colors.black12,
       //http://pan.apaipai.top:5000/webapi/entry.cgi?api=SYNO.Core.PersonalSettings&method=wallpaper&version=1&path=%22%22&retina=true&id=3&SynoToken=ypyTfQY0Hld7I
+      appBar: AppBar(
+        titleSpacing: 0,
+        leadingWidth: 0,
+        notificationPredicate: (_) {
+          return false;
+        },
+        flexibleSpace: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              color: Colors.white.withOpacity(0.5), // 设置模糊背景的颜色和透明度
+            ),
+          ),
+        ),
+        // leading: Button(
+        //   onPressed: () {},
+        //   child: Icon(Icons.add),
+        // ),
+        // title: Text(
+        //   "控制台",
+        //   style: TextStyle(color: light ? Colors.black54 : Colors.white54),
+        // ),
+        title: Row(
+          children: [
+            Button(
+              fill: false,
+              onPressed: () {},
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.change_circle_outlined,
+                    size: 16,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    "admin",
+                    strutStyle: StrutStyle(forceStrutHeight: true),
+                  ),
+                  Text(
+                    "(家里的NAS)",
+                    style: TextStyle(color: light ? Colors.black54 : Colors.white54),
+                    strutStyle: StrutStyle(forceStrutHeight: true),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(10),
+            ),
+          ],
+        ),
+        actions: [
+          Button(
+            fill: false,
+            onPressed: () {},
+            child: Icon(
+              Icons.edit,
+              size: 16,
+            ),
+            padding: EdgeInsets.all(10),
+          ),
+          Button(
+            fill: false,
+            onPressed: () async {
+              var res = await Api.dsm.entry("SYNO.Core.Terminal", "set", data: {
+                "enable_telnet": false,
+                "enable_ssh": false,
+                "ssh_port": 22,
+              }, parser: (data) {
+                return data;
+              });
+              print(res.data);
+            },
+            child: Icon(
+              Icons.alarm,
+              size: 16,
+            ),
+            padding: EdgeInsets.all(10),
+          ),
+        ],
+        backgroundColor: light ? Colors.white54 : Colors.black26,
+        automaticallyImplyLeading: false,
+      ),
       body: Stack(
         children: [
           ExtendedImage.network(
             "http://pan.apaipai.top:5000/webman/login_background.jpg",
-            height: MediaQuery.of(context).size.height,
+            height: context.height,
             fit: BoxFit.cover,
           ),
           BackdropFilter(
@@ -66,71 +152,8 @@ class _IndexState extends State<Index> {
             child: Container(
               color: light ? Colors.white54 : Colors.black26,
               child: ListView(
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.only(top: context.padding.top + 70),
                 children: [
-                  AppBar(
-                    titleSpacing: 0,
-                    leadingWidth: 0,
-                    // leading: Button(
-                    //   onPressed: () {},
-                    //   child: Icon(Icons.add),
-                    // ),
-                    // title: Text(
-                    //   "控制台",
-                    //   style: TextStyle(color: light ? Colors.black54 : Colors.white54),
-                    // ),
-                    title: Row(
-                      children: [
-                        Button(
-                          fill: false,
-                          onPressed: () {},
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.change_circle_outlined,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                "admin",
-                                strutStyle: StrutStyle(forceStrutHeight: true),
-                              ),
-                              Text(
-                                "(家里的NAS)",
-                                style: TextStyle(color: light ? Colors.black54 : Colors.white54),
-                                strutStyle: StrutStyle(forceStrutHeight: true),
-                              ),
-                            ],
-                          ),
-                          padding: EdgeInsets.all(10),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      Button(
-                        fill: false,
-                        onPressed: () {},
-                        child: Icon(
-                          Icons.edit,
-                          size: 16,
-                        ),
-                        padding: EdgeInsets.all(10),
-                      ),
-                      Button(
-                        fill: false,
-                        onPressed: () {},
-                        child: Icon(
-                          Icons.alarm,
-                          size: 16,
-                        ),
-                        padding: EdgeInsets.all(10),
-                      ),
-                    ],
-                    backgroundColor: light ? Colors.white54 : Colors.black26,
-                    automaticallyImplyLeading: false,
-                  ),
                   SizedBox(
                     height: 20,
                   ),
